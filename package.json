@@ -1,6 +1,9 @@
 {
   "dependencies": {
     "graphql": "^15.5.0",
+    "isomorphic-unfetch": "^3.1.0",
+    "next-urql": "^2.2.0",
+    "react-is": "^17.0.1",
     "urql": "^1.11.6"
   }
 }
