@@ -13,6 +13,7 @@ import { createConnection } from "typeorm";
 import settings from "../settings.json";
 import { Post } from "./entities/Post";
 import { User } from "./entities/User";
+import path from "path";
 
 const main = async () => {
   const conn = await createConnection({
@@ -22,9 +23,11 @@ const main = async () => {
     password: settings.pass,
     logging: true,
     synchronize: true,
+    migrations: [path.join(__dirname, "./migrations/*")],
     entities: [Post, User],
   });
 
+  await conn.runMigrations();
   const app = express();
 
   const RedisStore = connectRedis(session);
