@@ -25,6 +25,11 @@ export type Query = {
   me?: Maybe<User>;
 };
 
+export type QueryPostsArgs = {
+  cursor?: Maybe<Scalars["String"]>;
+  limit: Scalars["Int"];
+};
+
 export type QueryPostArgs = {
   id: Scalars["Float"];
 };
@@ -136,10 +141,7 @@ export type ChangePasswordMutationVariables = Exact<{
 }>;
 
 export type ChangePasswordMutation = { __typename?: "Mutation" } & {
-  changePassword: { __typename?: "UserResponse" } & {
-    errors?: Maybe<Array<{ __typename?: "FieldError" } & RegularErrorFragment>>;
-    user?: Maybe<{ __typename?: "User" } & RegularUserFragment>;
-  };
+  changePassword: { __typename?: "UserResponse" } & RegularUserResponseFragment;
 };
 
 export type CreatePostMutationVariables = Exact<{
@@ -168,10 +170,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 export type LoginMutation = { __typename?: "Mutation" } & {
-  login: { __typename?: "UserResponse" } & {
-    errors?: Maybe<Array<{ __typename?: "FieldError" } & RegularErrorFragment>>;
-    user?: Maybe<{ __typename?: "User" } & RegularUserFragment>;
-  };
+  login: { __typename?: "UserResponse" } & RegularUserResponseFragment;
 };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never }>;
@@ -195,7 +194,10 @@ export type MeQuery = { __typename?: "Query" } & {
   me?: Maybe<{ __typename?: "User" } & RegularUserFragment>;
 };
 
-export type PostsQueryVariables = Exact<{ [key: string]: never }>;
+export type PostsQueryVariables = Exact<{
+  limit: Scalars["Int"];
+  cursor?: Maybe<Scalars["String"]>;
+}>;
 
 export type PostsQuery = { __typename?: "Query" } & {
   posts: Array<
@@ -233,16 +235,10 @@ export const RegularUserResponseFragmentDoc = gql`
 export const ChangePasswordDocument = gql`
   mutation ChangePassword($token: String!, $newPassword: String!) {
     changePassword(token: $token, newPassword: $newPassword) {
-      errors {
-        ...RegularError
-      }
-      user {
-        ...RegularUser
-      }
+      ...RegularUserResponse
     }
   }
-  ${RegularErrorFragmentDoc}
-  ${RegularUserFragmentDoc}
+  ${RegularUserResponseFragmentDoc}
 `;
 
 export function useChangePasswordMutation() {
@@ -285,16 +281,10 @@ export function useForgotPasswordMutation() {
 export const LoginDocument = gql`
   mutation Login($usernameOrEmail: String!, $password: String!) {
     login(usernameOrEmail: $usernameOrEmail, password: $password) {
-      errors {
-        ...RegularError
-      }
-      user {
-        ...RegularUser
-      }
+      ...RegularUserResponse
     }
   }
-  ${RegularErrorFragmentDoc}
-  ${RegularUserFragmentDoc}
+  ${RegularUserResponseFragmentDoc}
 `;
 
 export function useLoginMutation() {
@@ -340,8 +330,8 @@ export function useMeQuery(
   return Urql.useQuery<MeQuery>({ query: MeDocument, ...options });
 }
 export const PostsDocument = gql`
-  query Posts {
-    posts {
+  query Posts($limit: Int!, $cursor: String) {
+    posts(cursor: $cursor, limit: $limit) {
       id
       createdAt
       updatedAt
