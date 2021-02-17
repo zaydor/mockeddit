@@ -11,10 +11,8 @@ import {
   Link,
   Stack,
   Text,
-  Tooltip,
 } from "@chakra-ui/react";
 import NextLink from "next/link";
-import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
 import { UpdootSection } from "../components/UpdootSection";
 
 const Index = () => {
@@ -33,7 +31,7 @@ const Index = () => {
   return (
     <Layout>
       <Flex align="center">
-        <Heading>Mockeddit</Heading>
+        <Heading>The Feed</Heading>
         <NextLink href="/create-post">
           <Link ml="auto">create post</Link>
         </NextLink>

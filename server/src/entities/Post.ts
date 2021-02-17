@@ -1,4 +1,4 @@
-import { Field, ObjectType } from "type-graphql";
+import { Field, Int, ObjectType } from "type-graphql";
 import {
   Column,
   CreateDateColumn,
@@ -49,4 +49,7 @@ export class Post extends BaseEntity {
 
   @OneToMany(() => Updoot, (updoot) => updoot.user)
   updoots: Updoot[];
+
+  @Field(() => Int, { nullable: true })
+  voteStatus: number | null; // 1, -1, or null
 }

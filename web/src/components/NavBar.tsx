@@ -1,11 +1,7 @@
-import { Box, Button, Flex, Link } from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Link, Text } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
-import {
-  useLoginMutation,
-  useLogoutMutation,
-  useMeQuery,
-} from "../generated/graphql";
+import { useLogoutMutation, useMeQuery } from "../generated/graphql";
 import { isServer } from "../utils/isServer";
 
 interface NavBarProps {}
@@ -53,7 +49,12 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     );
   }
   return (
-    <Flex zIndex={1} position="sticky" top={0} bg="tomato" p={4}>
+    <Flex zIndex={1} position="sticky" top={0} p={4} backgroundColor="#4FD1C5">
+      <Box mr={"auto"}>
+        <Text fontSize={20}>
+          <b>Mockeddit</b>
+        </Text>
+      </Box>
       <Box ml={"auto"}>{body}</Box>
     </Flex>
   );

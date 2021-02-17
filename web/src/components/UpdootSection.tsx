@@ -1,5 +1,5 @@
 import { ChevronUpIcon, ChevronDownIcon } from "@chakra-ui/icons";
-import { Box, Tooltip, Text } from "@chakra-ui/react";
+import { Box, Tooltip, Text, IconButton } from "@chakra-ui/react";
 import React, { useState } from "react";
 import { PostSnippetFragment, useVoteMutation } from "../generated/graphql";
 
@@ -15,9 +15,8 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
   return (
     <Box>
       <Tooltip label="UpDoot" aria-label="UpDoot Post">
-        <ChevronUpIcon
-          w={6}
-          h={6}
+        <IconButton
+          colorScheme={post.voteStatus === 1 ? "green" : undefined}
           onClick={async () => {
             setLoadingState("updoot-loading");
             await vote({
@@ -26,8 +25,14 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
             });
             setLoadingState("not-loading");
           }}
-          isLoading={loadingState === "updoot-loading"}
-          cursor="pointer"
+          aria-label="updoot post"
+          icon={
+            <ChevronUpIcon
+              w={6}
+              h={6}
+              isLoading={loadingState === "updoot-loading"}
+            />
+          }
         />
       </Tooltip>
       <Box textAlign="center">
@@ -36,10 +41,9 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
         </Tooltip>
       </Box>
       <Tooltip label="DownDoot" aria-label="DownDoot Post">
-        <ChevronDownIcon
-          w={6}
-          h={6}
-          cursor="pointer"
+        <IconButton
+          colorScheme={post.voteStatus === -1 ? "red" : undefined}
+          aria-label="DownDoot Post"
           onClick={async () => {
             setLoadingState("downdoot-loading");
             await vote({
@@ -48,7 +52,13 @@ export const UpdootSection: React.FC<UpdootSectionProps> = ({ post }) => {
             });
             setLoadingState("not-loading");
           }}
-          isLoading={loadingState === "downdoot-loading"}
+          icon={
+            <ChevronDownIcon
+              w={6}
+              h={6}
+              isLoading={loadingState === "downdoot-loading"}
+            />
+          }
         />
       </Tooltip>
     </Box>
