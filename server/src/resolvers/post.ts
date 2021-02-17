@@ -72,7 +72,7 @@ export class PostResolver {
         set points = points + $1
         where id = $2
         `,
-          [val, postId]
+          [2 * val, postId]
         );
       });
     } else if (!updoot) {
@@ -103,36 +103,111 @@ export class PostResolver {
   @Query(() => PaginatedPosts)
   async posts(
     @Arg("limit", () => Int) limit: number,
-    @Arg("cursor", () => String, { nullable: true }) cursor: string | null
+    @Arg("cursor", () => String, { nullable: true }) cursor: string | null,
+    @Ctx() { req }: MyContext
   ): Promise<PaginatedPosts> {
+    let cursorFlag = false,
+      userIdFlag = false;
     const realLimit = Math.min(50, limit);
     const realLimitPlusOne = Math.min(50, limit) + 1;
 
     const replacements: any[] = [realLimitPlusOne];
 
-    if (cursor) {
-      replacements.push(new Date(parseInt(cursor)));
+    if (req.session.userId) {
+      replacements.push(req.session.userId);
+      userIdFlag = true;
     }
 
-    // fetching data in graphql when I have relationships
-    const posts = await getConnection().query(
-      `
-    select p.*,
-    json_build_object(
-      'id', u.id,
-      'username', u.username,
-      'email', u.email,
-      'createdAt', u."createdAt",
-      'updatedAt', u."updatedAt"
-      ) creator
-    from post p
-    inner join public.user u on u.id = p."creatorId"
-    ${cursor ? `where p."createdAt" < $2` : ""}
-    order by p."createdAt" DESC
-    limit $1
-    `,
-      replacements
-    );
+    if (cursor) {
+      replacements.push(new Date(parseInt(cursor)));
+      cursorFlag = true;
+    }
+
+    let posts;
+
+    // I was getting an error when trying to push userId to replacements
+    // because userId does not always exist, sometimes "$2" did not exist
+    // and if there is a cursor (whose value is denoted by "$3") then
+    // an error is thrown and styling disappears for the navbar..
+    // while this solution is ugly, it is needed until further notice..
+    if (userIdFlag && cursorFlag) {
+      posts = await getConnection().query(
+        `
+      select p.*,
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator,
+        (select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"
+      from post p
+      inner join public.user u on u.id = p."creatorId"
+      where p."createdAt" < $3
+      order by p."createdAt" DESC
+      limit $1
+      `,
+        replacements
+      );
+    } else if (userIdFlag && !cursorFlag) {
+      posts = await getConnection().query(
+        `
+      select p.*,
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator,
+        (select value from updoot where "userId" = $2 and "postId" = p.id) "voteStatus"
+      from post p
+      inner join public.user u on u.id = p."creatorId"
+      order by p."createdAt" DESC
+      limit $1
+      `,
+        replacements
+      );
+    } else if (!userIdFlag && cursorFlag) {
+      posts = await getConnection().query(
+        `
+      select p.*,
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator,
+       null as "voteStatus"
+      from post p
+      inner join public.user u on u.id = p."creatorId"
+      where p."createdAt" < $2
+      order by p."createdAt" DESC
+      limit $1
+      `,
+        replacements
+      );
+    } else {
+      posts = await getConnection().query(
+        `
+      select p.*,
+      json_build_object(
+        'id', u.id,
+        'username', u.username,
+        'email', u.email,
+        'createdAt', u."createdAt",
+        'updatedAt', u."updatedAt"
+        ) creator
+      from post p
+      inner join public.user u on u.id = p."creatorId"
+      order by p."createdAt" DESC
+      limit $1
+      `,
+        replacements
+      );
+    }
 
     // const qb = getConnection()
     //   .getRepository(Post)
