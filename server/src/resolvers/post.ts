@@ -16,6 +16,7 @@ import {
 } from "type-graphql";
 import { Post } from "../entities/Post";
 import { getConnection } from "typeorm";
+import { Updoot } from "../entities/Updoot";
 
 @InputType()
 class PostInput {
@@ -37,7 +38,7 @@ class PaginatedPosts {
 export class PostResolver {
   @FieldResolver(() => String)
   textSnippet(@Root() root: Post) {
-    return root.text.length > 50 ? `${root.text.slice(0, 50)}...` : root.text;
+    return root.text.length > 50 ? `${root.text.slice(0, 80)}...` : root.text;
   }
 
   @Mutation(() => Boolean)
@@ -50,26 +51,51 @@ export class PostResolver {
     const isUpdoot = value !== -1;
     const val = isUpdoot ? 1 : -1;
     const { userId } = req.session;
-    // await Updoot.insert({
-    //   userId,
-    //   postId,
-    //   value: val,
-    // });
+    const updoot = await Updoot.findOne({ where: { postId, userId } });
 
-    getConnection().query(
-      `
-      START TRANSACTION;
+    // user has voted on the post before
+    if (updoot && updoot.value !== val) {
+      // changing their vote
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `
+        update updoot
+        set value = $1
+        where "postId" = $2 and "userId" = $3
+        `,
+          [val, postId, userId]
+        );
 
-      insert into updoot ("userId", "postId", value)
-      values (${userId}, ${postId}, ${val});
+        await tm.query(
+          `
+        update post
+        set points = points + $1
+        where id = $2
+        `,
+          [val, postId]
+        );
+      });
+    } else if (!updoot) {
+      // has never voted before
+      await getConnection().transaction(async (tm) => {
+        await tm.query(
+          `
+        insert into updoot ("userId", "postId", value)
+        values ($1, $2, $3)
+        `,
+          [userId, postId, val]
+        );
 
-      update post
-      set points = points + ${val}
-      where id = ${postId};
-
-      COMMIT;
-    `
-    );
+        await tm.query(
+          `
+        update post
+        set points = points + $1
+        where id = $2
+        `,
+          [val, postId]
+        );
+      });
+    }
 
     return true;
   }

@@ -134,6 +134,11 @@ export type UsernamePasswordInput = {
   email: Scalars["String"];
 };
 
+export type PostSnippetFragment = { __typename?: "Post" } & Pick<
+  Post,
+  "id" | "createdAt" | "updatedAt" | "title" | "text" | "textSnippet" | "points"
+> & { creator: { __typename?: "User" } & Pick<User, "id" | "username"> };
+
 export type RegularErrorFragment = { __typename?: "FieldError" } & Pick<
   FieldError,
   "field" | "message"
@@ -202,6 +207,13 @@ export type RegisterMutation = { __typename?: "Mutation" } & {
   register: { __typename?: "UserResponse" } & RegularUserResponseFragment;
 };
 
+export type VoteMutationVariables = Exact<{
+  value: Scalars["Int"];
+  postId: Scalars["Int"];
+}>;
+
+export type VoteMutation = { __typename?: "Mutation" } & Pick<Mutation, "vote">;
+
 export type MeQueryVariables = Exact<{ [key: string]: never }>;
 
 export type MeQuery = { __typename?: "Query" } & {
@@ -215,15 +227,25 @@ export type PostsQueryVariables = Exact<{
 
 export type PostsQuery = { __typename?: "Query" } & {
   posts: { __typename?: "PaginatedPosts" } & Pick<PaginatedPosts, "hasMore"> & {
-      posts: Array<
-        { __typename?: "Post" } & Pick<
-          Post,
-          "id" | "createdAt" | "updatedAt" | "title" | "text" | "textSnippet"
-        > & { creator: { __typename?: "User" } & Pick<User, "id" | "username"> }
-      >;
+      posts: Array<{ __typename?: "Post" } & PostSnippetFragment>;
     };
 };
 
+export const PostSnippetFragmentDoc = gql`
+  fragment PostSnippet on Post {
+    id
+    createdAt
+    updatedAt
+    title
+    text
+    textSnippet
+    points
+    creator {
+      id
+      username
+    }
+  }
+`;
 export const RegularErrorFragmentDoc = gql`
   fragment RegularError on FieldError {
     field
@@ -331,6 +353,15 @@ export function useRegisterMutation() {
     RegisterDocument
   );
 }
+export const VoteDocument = gql`
+  mutation Vote($value: Int!, $postId: Int!) {
+    vote(value: $value, postId: $postId)
+  }
+`;
+
+export function useVoteMutation() {
+  return Urql.useMutation<VoteMutation, VoteMutationVariables>(VoteDocument);
+}
 export const MeDocument = gql`
   query Me {
     me {
@@ -350,19 +381,11 @@ export const PostsDocument = gql`
     posts(cursor: $cursor, limit: $limit) {
       hasMore
       posts {
-        id
-        createdAt
-        updatedAt
-        title
-        text
-        textSnippet
-        creator {
-          id
-          username
-        }
+        ...PostSnippet
       }
     }
   }
+  ${PostSnippetFragmentDoc}
 `;
 
 export function usePostsQuery(
