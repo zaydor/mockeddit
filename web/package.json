@@ -20,12 +20,12 @@
     "graphql-tag": "^2.11.0",
     "isomorphic-unfetch": "^3.1.0",
     "next": "latest",
-    "next-urql": "^2.2.0",
+    "next-urql": "^3.0.0",
     "prettier": "^2.2.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-is": "^17.0.1",
-    "urql": "^1.11.6"
+    "urql": "^2.0.1"
   },
   "license": "MIT",
   "devDependencies": {
