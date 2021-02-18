@@ -136,7 +136,7 @@ export class UserResolver {
   }
 
   @Query(() => User, { nullable: true })
-  me(@Ctx() { req }: MyContext) {
+  me(@Ctx() { req }: MyContext): any {
     if (!req.session.userId) {
       return null; // user is not logged in
     }

@@ -28,7 +28,12 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   } else if (!data?.me) {
     // user is not logged in
     body = (
-      <>
+      <Flex>
+        <Box mr={2}>
+          <NextLink href="/create-post">
+            <Link>create post</Link>
+          </NextLink>
+        </Box>
         <NextLink href="/login">
           <Link color="white" mr={2}>
             login
@@ -37,13 +42,22 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
         <NextLink href="/register">
           <Link color="white">register</Link>
         </NextLink>
-      </>
+      </Flex>
     );
   } else {
     // user is logged in
     body = (
-      <Flex>
-        <Box mr={4}>{data.me.username}</Box>
+      <Flex align="center">
+        <Box>
+          <NextLink href="/create-post">
+            <Button as={Link} bg="#FEA82F" mr={4}>
+              <Link>create post</Link>
+            </Button>
+          </NextLink>
+        </Box>
+        <Box mr={4} textColor="#8EF9F3">
+          {data.me.username}
+        </Box>
         <Button
           onClick={() => {
             logout();
@@ -57,19 +71,17 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
     );
   }
   return (
-    <Flex zIndex={1} position="sticky" top={0} p={4} backgroundColor="#4FD1C5">
-      <Box mr={"auto"}>
+    <Flex zIndex={1} position="sticky" top={0} p={4} backgroundColor="#171738">
+      <Flex flex={1} m="auto" align="center" maxW={800}>
         <NextLink href="/">
           <Link>
             <Tooltip label="Go to The Feed" aria-label="Go to The Feed">
-              <Text fontSize={20}>
-                <b>Mockeddit</b>
-              </Text>
+              <Heading color="#8EF9F3">Mockeddit</Heading>
             </Tooltip>
           </Link>
         </NextLink>
-      </Box>
-      <Box ml={"auto"}>{body}</Box>
+        <Box ml={"auto"}>{body}</Box>
+      </Flex>
     </Flex>
   );
 };

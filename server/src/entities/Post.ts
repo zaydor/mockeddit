@@ -47,7 +47,7 @@ export class Post extends BaseEntity {
   @Column({ type: "int", default: 0 })
   points!: number;
 
-  @OneToMany(() => Updoot, (updoot) => updoot.user)
+  @OneToMany(() => Updoot, (updoot) => updoot.post)
   updoots: Updoot[];
 
   @Field(() => Int, { nullable: true })
