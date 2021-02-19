@@ -20,7 +20,8 @@ import {
 } from "@chakra-ui/react";
 import NextLink from "next/link";
 import { UpdootSection } from "../components/UpdootSection";
-import { DeleteIcon } from "@chakra-ui/icons";
+import { DeleteIcon, EditIcon } from "@chakra-ui/icons";
+import { EditDeletePostButtons } from "../components/EditDeletePostButtons";
 
 const Index = () => {
   const [variables, setVariables] = useState({
@@ -65,18 +66,9 @@ const Index = () => {
                       {p.textSnippet}
                     </Text>
                     {p.creator.username === currUser.data?.me?.username ? (
-                      <Box ml="auto">
-                        <Tooltip label="Delete Post" aria-label="Delete Post">
-                          <IconButton
-                            aria-label="Delete Post"
-                            icon={<DeleteIcon />}
-                            bottom={-6}
-                            onClick={() => {
-                              deletePost({ id: p.id });
-                            }}
-                          />
-                        </Tooltip>
-                      </Box>
+                      <Flex ml="auto">
+                        <EditDeletePostButtons id={p.id} />
+                      </Flex>
                     ) : null}
                   </Flex>
                 </Box>
