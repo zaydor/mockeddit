@@ -131,6 +131,7 @@ export class UserResolver {
       email,
       "Update password",
       `<a href="http://localhost:3000/change-password/${token}">reset password</a>`
+      // TODO: set up a real email provider and change http://localhost:3000 to whatever my origin is in prod
     );
     return true;
   }

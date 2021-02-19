@@ -1,25 +1,15 @@
-import React from "react";
+import { Box, Button, Flex, Link } from "@chakra-ui/react";
 import { Form, Formik } from "formik";
-import {
-  FormControl,
-  FormLabel,
-  Input,
-  FormErrorMessage,
-  Box,
-  Button,
-  Link,
-  Flex,
-} from "@chakra-ui/react";
-import { Wrapper } from "../components/Wrapper";
-import { InputField } from "../components/InputField";
-import { useMutation } from "urql";
-import { useLoginMutation } from "../generated/graphql";
-import { toErrorMap } from "../utils/toErrorMap";
-import { useRouter } from "next/router";
 import { withUrqlClient } from "next-urql";
-import { createUrqlClient } from "../utils/createUrqlClient";
 import NextLink from "next/link";
+import { useRouter } from "next/router";
+import React from "react";
 import { BackButton } from "../components/BackButton";
+import { InputField } from "../components/InputField";
+import { Wrapper } from "../components/Wrapper";
+import { useLoginMutation } from "../generated/graphql";
+import { createUrqlClient } from "../utils/createUrqlClient";
+import { toErrorMap } from "../utils/toErrorMap";
 
 interface registerProps {}
 

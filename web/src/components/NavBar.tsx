@@ -1,12 +1,4 @@
-import {
-  Box,
-  Button,
-  Flex,
-  Heading,
-  Link,
-  Text,
-  Tooltip,
-} from "@chakra-ui/react";
+import { Box, Button, Flex, Heading, Link, Tooltip } from "@chakra-ui/react";
 import React from "react";
 import NextLink from "next/link";
 import { useLogoutMutation, useMeQuery } from "../generated/graphql";
